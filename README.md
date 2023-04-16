@@ -1,4 +1,3 @@
-"""
 # Create Your Own ChatGPT on Telegram: A Step-by-Step Guide to Building a Python-powered AI Bot
 
 ## Introduction
