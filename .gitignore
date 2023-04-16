@@ -131,3 +131,4 @@ dmypy.json
 
 bot.log
 error.log
+db.sqlite3
