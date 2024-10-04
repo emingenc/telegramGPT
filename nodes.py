@@ -1,5 +1,5 @@
 from services import conversational, retrieve
-from agents.crag import crag
+from agents.crag import run_crag_pipeline
 
 
 nodes = {
@@ -8,12 +8,14 @@ nodes = {
         "node": conversational,
     },
     "retriever": {
-        "description": "Use this if user ask spesifically about whats in DB Retrieve relevant documents from the vectorstore",
+        "description": "Use this if user ask about whats in DB Retrieve relevant documents from the vectorstore",
         "node": retrieve,
     },
     "crag": {
-        "description": "Run the CRAG pipeline to generate an answer. use main RAG pipeline as this. If you think you'll need web search use this",
-        "node": crag,
+        "description": """Run the CRAG pipeline to generate an answer. 
+        use main RAG pipeline as this. This is main llm model. this should be selected
+        If you think you'll need web search use this""",
+        "node": run_crag_pipeline,
     },
 }
 

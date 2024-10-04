@@ -9,3 +9,8 @@ def handle_response(content, user, message_id, content_type) -> str:
     if not answer:
         return "Sorry, I couldn't find an answer to your question."
     return answer
+
+if __name__ == "__main__":
+    question = "do CRAG . How is the weather in Ankara. "
+    res = handle_response(question, "user", "123", "text")
+    print(res)
