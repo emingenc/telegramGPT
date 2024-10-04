@@ -20,28 +20,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Configuration
-VECTOR_DB_PATH = "vectorstore_db"
+VECTOR_DB_PATH = "./vectorstore_db"
 COLLECTION_NAME = "rag-chroma"
 BOTNAME = os.getenv("BOTNAME", "RAG Bot")
 
 
-
 def initialize_vectorstore(docs: List[Document]) -> Chroma:
-    """Initialize or load the vectorstore with time-weighted retrieval."""
+    """Initialize or load the vectorstore and add new documents if necessary."""
     vector_store = Chroma(
         collection_name=COLLECTION_NAME,
-        embedding_function = embeddings,
-        persist_directory = VECTOR_DB_PATH,
-       
+        embedding_function=embeddings,
+        persist_directory=VECTOR_DB_PATH,
     )
+    if docs:
+        vector_store.add_documents(docs)
+    
+    logger.info("Vector store initialized successfully.")
+    
     retriever = vector_store.as_retriever(
-    search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
+        search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
     )
-    retriever.add_documents(docs)
-  
 
     return retriever
-
 
 # Prepare documents and vector store
 def load_documents(urls: List[str]) -> List[Document]:
@@ -97,14 +97,14 @@ def add_docs_to_vectorstore(docs: List[Document], retriever: Chroma):
         
 # Load and process documents
 urls = [
-    "https://lilianweng.github.io/posts/2023-06-23-agent/",
-    "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
-    "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
+    # "https://lilianweng.github.io/posts/2023-06-23-agent/",
+    # "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
+    # "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
 ]
-docs = load_documents(urls)
-doc_splits = split_documents(docs)
-retriever = initialize_vectorstore(doc_splits)
+if urls:
+    docs = load_documents(urls)
+    doc_splits = split_documents(docs)
+    retriever = initialize_vectorstore(doc_splits)
 
-res = retriever.invoke("llm agents")
-print(res)
+retriever = initialize_vectorstore([])
 
