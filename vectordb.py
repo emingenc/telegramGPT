@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List
+from typing import List, Dict
 from datetime import datetime
 
 # Import LangChain components
@@ -34,14 +34,15 @@ def initialize_vectorstore(docs: List[Document]) -> Chroma:
     )
     if docs:
         vector_store.add_documents(docs)
-    
+
     logger.info("Vector store initialized successfully.")
-    
+
     retriever = vector_store.as_retriever(
-        search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
+        search_type="mmr", search_kwargs={"k": 3, "fetch_k": 10}
     )
 
     return retriever
+
 
 # Prepare documents and vector store
 def load_documents(urls: List[str]) -> List[Document]:
@@ -62,9 +63,7 @@ def split_documents(docs: List[Document]) -> List[Document]:
 
 
 # Function to add results to vectorstore
-def add_to_vectorstore(
-    question: str, answer: str, retriever: Chroma
-):
+def add_to_vectorstore(question: str, answer: str, user: Dict, retriever: Chroma):
     """Add question and answer to vectorstore with incremental learning."""
     try:
         logger.info("Adding question and answer to vectorstore...")
@@ -74,7 +73,12 @@ def add_to_vectorstore(
 
         qa_doc = Document(
             page_content=f"Q: {question}\nA: {answer}",
-            metadata={"source": "chatbot", "created_at": datetime.now().isoformat()},
+            metadata={
+                "source": "chatbot",
+                "created_at": datetime.now().isoformat(),
+                "username": user.get("username"),
+                "user_id": user.get("id"),
+            },
         )
         filtered_docs = filter_complex_metadata([qa_doc])
 
@@ -86,6 +90,7 @@ def add_to_vectorstore(
     except Exception as e:
         logger.error(f"Error adding to vectorstore: {str(e)}")
 
+
 def add_docs_to_vectorstore(docs: List[Document], retriever: Chroma):
     """Add documents to vectorstore."""
     try:
@@ -94,7 +99,8 @@ def add_docs_to_vectorstore(docs: List[Document], retriever: Chroma):
         logger.info("Successfully added to vectorstore")
     except Exception as e:
         logger.error(f"Error adding to vectorstore: {str(e)}")
-        
+
+
 # Load and process documents
 urls = [
     # "https://lilianweng.github.io/posts/2023-06-23-agent/",
@@ -107,4 +113,3 @@ if urls:
     retriever = initialize_vectorstore(doc_splits)
 
 retriever = initialize_vectorstore([])
-
