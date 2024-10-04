@@ -30,7 +30,7 @@ def handle_response(content, user, message_id, content_type) -> str:
         user_id = user.id
         user_dict = {"username": username, "id": user_id}
         chat_history = filter_chat(username, user_id, docs)
-        query = {"question": f"chat_history:{chat_history} Q:{content}"}
+        query = {"question": f"chat_history: {chat_history} Question: {content} Ai:"}
         response = app.invoke(query)
         add_to_vectorstore(content, response.get("answer"), user_dict, retriever)
     else:

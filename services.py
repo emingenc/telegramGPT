@@ -23,7 +23,6 @@ def conversational(state: GraphState) -> GraphState:
 
 def retrieve(state: GraphState) -> GraphState:
     docs = retriever.invoke(state.question)
-    print(docs)
     if not docs:
         state.answer = "Sorry, I couldn't find any relevant documents."
     docsstr = "\n\n".join(doc.page_content for doc in docs)
