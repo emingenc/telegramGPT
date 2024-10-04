@@ -7,4 +7,5 @@ python-dotenv==1.0.1
 openai==1.51.0
 bs4==0.0.2
 tiktoken==0.7.0
-faiss-cpu==1.8.0.post1
+chromadb==0.5.11
+langchain-chroma==0.1.4

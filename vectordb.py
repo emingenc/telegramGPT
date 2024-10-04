@@ -4,16 +4,14 @@ from typing import List
 from datetime import datetime
 
 # Import LangChain components
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import WebBaseLoader
-from langchain.embeddings.base import Embeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-from langchain_community.vectorstores import FAISS
-from langchain.retrievers import TimeWeightedVectorStoreRetriever
+from langchain_chroma import Chroma
 from langchain_community.vectorstores.utils import filter_complex_metadata
-from langchain_openai import OpenAIEmbeddings
 
 from dotenv import load_dotenv
+from conf import embeddings
 
 load_dotenv()
 
@@ -23,37 +21,24 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 VECTOR_DB_PATH = "vectorstore_db"
-COLLECTION_NAME = "rag-faiss"
+COLLECTION_NAME = "rag-chroma"
 BOTNAME = os.getenv("BOTNAME", "RAG Bot")
 
 
-def get_embeddings() -> Embeddings:
-    """Function to get the embeddings model."""
-    return OpenAIEmbeddings()
 
-
-def initialize_vectorstore(docs: List[Document]) -> TimeWeightedVectorStoreRetriever:
+def initialize_vectorstore(docs: List[Document]) -> Chroma:
     """Initialize or load the vectorstore with time-weighted retrieval."""
-    embeddings = OpenAIEmbeddings()
-
-    if os.path.exists(VECTOR_DB_PATH):
-        try:
-            vectorstore = FAISS.load_local(
-                VECTOR_DB_PATH, embeddings, allow_dangerous_deserialization=True
-            )
-        except ValueError:
-            logger.warning(
-                "Existing vectorstore couldn't be loaded. Creating a new one."
-            )
-            vectorstore = FAISS.from_documents(docs, embeddings)
-            vectorstore.save_local(VECTOR_DB_PATH)
-    else:
-        vectorstore = FAISS.from_documents(docs, embeddings)
-        vectorstore.save_local(VECTOR_DB_PATH)
-
-    retriever = TimeWeightedVectorStoreRetriever(
-        vectorstore=vectorstore, decay_rate=0.05, k=5
+    vector_store = Chroma(
+        collection_name=COLLECTION_NAME,
+        embedding_function = embeddings,
+        persist_directory = VECTOR_DB_PATH,
+       
     )
+    retriever = vector_store.as_retriever(
+    search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
+    )
+    retriever.add_documents(docs)
+  
 
     return retriever
 
@@ -78,7 +63,7 @@ def split_documents(docs: List[Document]) -> List[Document]:
 
 # Function to add results to vectorstore
 def add_to_vectorstore(
-    question: str, answer: str, retriever: TimeWeightedVectorStoreRetriever
+    question: str, answer: str, retriever: Chroma
 ):
     """Add question and answer to vectorstore with incremental learning."""
     try:
@@ -101,7 +86,7 @@ def add_to_vectorstore(
     except Exception as e:
         logger.error(f"Error adding to vectorstore: {str(e)}")
 
-def add_docs_to_vectorstore(docs: List[Document], retriever: TimeWeightedVectorStoreRetriever):
+def add_docs_to_vectorstore(docs: List[Document], retriever: Chroma):
     """Add documents to vectorstore."""
     try:
         logger.info("Adding documents to vectorstore...")
@@ -120,6 +105,6 @@ docs = load_documents(urls)
 doc_splits = split_documents(docs)
 retriever = initialize_vectorstore(doc_splits)
 
-res = retriever.invoke("Vancouver?")
+res = retriever.invoke("llm agents")
 print(res)
 
