@@ -38,7 +38,11 @@ def initialize_vectorstore(docs: List[Document]) -> Chroma:
     logger.info("Vector store initialized successfully.")
 
     retriever = vector_store.as_retriever(
+<<<<<<< HEAD
         search_type="mmr", search_kwargs={"k": 3, "fetch_k": 5}
+=======
+        search_type="mmr", search_kwargs={"k": 3, "fetch_k": 10}
+>>>>>>> 3df12e8 (add chat history)
     )
     retriever = vector_store.as_retriever(
     search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
@@ -94,6 +98,7 @@ def add_to_vectorstore(question: str, answer: str, user: Dict, retriever: Chroma
         logger.info("Successfully added to vectorstore")
     except Exception as e:
         logger.error(f"Error adding to vectorstore: {str(e)}")
+
 
 def add_docs_to_vectorstore(docs: List[Document], retriever: Chroma):
     """Add documents to vectorstore."""
