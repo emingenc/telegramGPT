@@ -4,6 +4,8 @@
 
 Are you tired of using the same AI-powered chatbots available on the market? Do you want to build your own chatbot and customize it to your liking? Then, look no further! In this blog post, we'll walk you through a step-by-step guide on creating your very own AI bot using Python, Telegram, and OpenAI GPT models. Get ready to unleash the power of artificial intelligence right at your fingertips!
 
+when you change models at conf.py be sure start new evctordb since vector dimension is different for each model.
+
 ## Route llm usage
 
 you can give any llm in nodes.py router_llm.py automatically use optimal llm for you.
