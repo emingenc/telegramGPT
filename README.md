@@ -19,7 +19,7 @@ You can add any additional llm to the nodes.py file.
 - A Telegram account
 - A Telegram bot API token (you can get one from the BotFather bot on Telegram)
 - An OpenAI API key (you can get one by signing up on the OpenAI website)
-- make sure you added your username in conf.py
+- make sure you added your username env file
 - Docker and docker-compose
 
 ### Steps
