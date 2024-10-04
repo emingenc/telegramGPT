@@ -1,4 +1,5 @@
 from services import conversational, retrieve
+from agents.crag import crag
 
 
 nodes = {
@@ -7,9 +8,13 @@ nodes = {
         "node": conversational,
     },
     "retriever": {
-        "description": "Retrieve relevant documents from the vectorstore",
+        "description": "Use this if user ask spesifically about whats in DB Retrieve relevant documents from the vectorstore",
         "node": retrieve,
-    }
+    },
+    "crag": {
+        "description": "Run the CRAG pipeline to generate an answer. use main RAG pipeline as this. If you think you'll need web search use this",
+        "node": crag,
+    },
 }
 
 options_str = "\n".join(

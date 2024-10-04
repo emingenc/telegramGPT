@@ -4,6 +4,6 @@ services:
   telegram-gpt-app:
     build: .
     volumes:
-      - .:/vectorstore_db
+      - ./vectorstore_db:/app/vectorstore_db
     env_file:
       - .env
