@@ -101,7 +101,15 @@ def add_to_vectorstore(
     except Exception as e:
         logger.error(f"Error adding to vectorstore: {str(e)}")
 
-
+def add_docs_to_vectorstore(docs: List[Document], retriever: TimeWeightedVectorStoreRetriever):
+    """Add documents to vectorstore."""
+    try:
+        logger.info("Adding documents to vectorstore...")
+        retriever.add_documents(docs)
+        logger.info("Successfully added to vectorstore")
+    except Exception as e:
+        logger.error(f"Error adding to vectorstore: {str(e)}")
+        
 # Load and process documents
 urls = [
     "https://lilianweng.github.io/posts/2023-06-23-agent/",
@@ -111,4 +119,7 @@ urls = [
 docs = load_documents(urls)
 doc_splits = split_documents(docs)
 retriever = initialize_vectorstore(doc_splits)
+
+res = retriever.invoke("Vancouver?")
+print(res)
 
