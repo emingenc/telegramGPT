@@ -4,6 +4,49 @@
 
 Are you tired of using the same AI-powered chatbots available on the market? Do you want to build your own chatbot and customize it to your liking? Then, look no further! In this blog post, we'll walk you through a step-by-step guide on creating your very own AI bot using Python, Telegram, and OpenAI GPT models. Get ready to unleash the power of artificial intelligence right at your fingertips!
 
+## Route llm usage
+
+you can give any llm in nodes.py router_llm.py automatically use optimal llm for you.
+
+You can add any additional llm to the nodes.py file. 
+
+
+
+## Quick start
+
+### Prerequisites
+
+- Python 3.10 or higher
+- A Telegram account
+- A Telegram bot API token (you can get one from the BotFather bot on Telegram)
+- An OpenAI API key (you can get one by signing up on the OpenAI website)
+- Docker and docker-compose
+
+### Steps
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/emingenc/telegramGPT.git
+cd telegramGPT
+```
+
+2. Set up environment variables create .env file
+    
+    ```bash
+    TELEGRAM_TOKEN=your_telegram_token
+    OPENAI_API_KEY=your_openai_api_key
+    BOTNAME=your_bot_name
+    ```
+
+3. Run the bot using docker-compose:
+    
+    ```bash
+    docker-compose up
+    ```
+
+
+
 ## Step 1: Setting up your Telegram bot
 
 Before diving into the code, you'll need to create a new bot on Telegram. Follow these simple steps:
@@ -50,7 +93,8 @@ users = ["your_telegram_username"]
 ## Step 6: Setting up the environment variables
 
 
-You need to set up two environment variables: TELEGRAM_TOKEN (the API token you received from BotFather) and OPENAI_API_KEY (your OpenAI API key). You can either add them to your system's environment variables or use a .env file.
+You need to set up environment variables: TELEGRAM_TOKEN (the API token you received from BotFather) and OPENAI_API_KEY (your OpenAI API key). BOTNAME (name of bot)
+You can either add them to your system's environment variables or use a .env file. 
 
 ## Step 7: Running the bot
 

@@ -1,127 +1,122 @@
 import os
 import logging
 from dotenv import load_dotenv
+
+
 from telegram import Update
-from telegram.ext import  ContextTypes, CommandHandler , MessageHandler  , ApplicationBuilder, filters
+from telegram.ext import (
+    ContextTypes,
+    CommandHandler,
+    MessageHandler,
+    ApplicationBuilder,
+    filters,
+)
 from conf import users
-from subprocess import call
+
 from gpt_message_handler import handle_response
-import sqlalchemy as db
-import io
 
-print('Starting up bot...')
-
+print("Starting up bot...")
 load_dotenv()
 
-TOKEN = os.getenv('TELEGRAM_TOKEN')
-BOTNAME = os.getenv('BOTNAME')
+
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+BOTNAME = os.getenv("BOTNAME")
 
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 
-# Create a decorator that takes users as an argument and if the user is in the list, it will run the function
-def user_allowed(users):
-    def decorator(func):
-        async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
-            user = update.message.from_user
-            logging.info(f'User {user.username} is trying to access the bot. id: {user.id}, message: {update.message.text}')
-            if user.username in users:
-                await func(update, context)
-            else:
-                await update.message.reply_text('You are not allowed to use this command')
-        return wrapper
-    return decorator
+def get_message_content(message):
+    if message.text:
+        return message.text, "text"
+    elif message.photo:
+        return message.photo[-1].file_id, "photo"
+    elif message.document:
+        return message.document.file_id, "document"
+    elif message.voice:
+        return message.voice.file_id, "voice"
+    elif message.audio:
+        return message.audio.file_id, "audio"
+    elif message.video:
+        return message.video.file_id, "video"
+    else:
+        return None, "unknown"
 
-# Lets us use the /start command
-@user_allowed(users)
+
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Hello there! I\'m a bot. What\'s up?')
+    await update.message.reply_text("Hello there! I'm a bot. What's up?")
 
 
-# Lets us use the /help command
-@user_allowed(users)
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Try typing anything and I will do my best to respond!')
+    await update.message.reply_text(
+        "Try typing anything and I will do my best to respond!"
+    )
 
 
-# Lets us use the /custom command
-@user_allowed(users)
 async def custom_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('This is a custom command, you can add whatever text you want here.')
+    await update.message.reply_text(
+        "This is a custom command, you can add whatever text you want here."
+    )
 
-# Lets us use the /restart
-@user_allowed(users)
+
 async def restart_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # delete the db.sqlite3 file
-    engine = db.create_engine("sqlite:///db.sqlite3")
-    connection = engine.connect()
-    metadata = db.MetaData()
-
-    try: 
-        conversations = db.Table('conversations', metadata, autoload=True, autoload_with=engine)
-    except:
-        conversations = db.Table('conversations', 
-                                metadata, 
-                                db.Column('id', db.Integer, primary_key=True), 
-                                db.Column('user_id', db.Integer), 
-                                db.Column('user_name', db.String), 
-                                db.Column('user_message', db.String), 
-                                db.Column('message_id', db.Integer),
-                                db.Column('bot_response', db.String), 
-                                db.Column('created_at', db.DateTime, default=datetime.now))
-
-        metadata.create_all(engine)
-    # delete all rows
-    query = db.delete(conversations)
-    ResultProxy = connection.execute(query)
-    print('Deleted all rows from conversations table')
-    await update.message.reply_text('Restarted the bot.')
+    await update.message.reply_text("Restarted the bot.")
 
 
-@user_allowed(users)
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print('Message received')
-    # Get basic info of the incoming message
-    message_type = update.message.chat.type
-    text = str(update.message.text).lower()
-    user = update.message.from_user
-    message_id = update.message.message_id
-    response = ''
+    message = update.effective_message
+    user = update.effective_user
+    message_id = message.message_id
 
-    # Print a log for debugging
-    print(f'User ({update.message.chat.id}) says: "{text}" in: {message_type}')
+    logging.info(f"User {user.username} ({user.id}) sent a message.")
 
-    if text.startswith(BOTNAME):
-        response = handle_response(text, user, message_id)
+    content, content_type = get_message_content(message)
 
-    # Reply normal if the message is in private
-    await update.message.reply_text(response)
+    if content_type == "unknown":
+        await message.reply_text("Sorry, I can't process this type of message yet.")
+        return
+
+    if content_type == "text":
+        response = handle_response(content, user, message_id, content_type)
+    else:
+        # For media files, download the file
+        file = await context.bot.get_file(content)
+        file_path = await file.download_to_drive()
+        # Pass the file path to handle_response
+        response = handle_response(file_path, user, message_id, content_type)
+
+    await message.reply_text(response)
 
 
-# Log errors
-@user_allowed(users)
-async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print(f'Update {update} caused error {context.error}')
+def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):
+    logging.error(msg="Exception while handling an update:", exc_info=context.error)
 
 
-# Run the program
-if __name__ == '__main__':
+if __name__ == "__main__":
     application = ApplicationBuilder().token(TOKEN).build()
 
-    # Commands
-    application.add_handler(CommandHandler('start', start_command))
-    application.add_handler(CommandHandler('help', help_command))
-    application.add_handler(CommandHandler('custom', custom_command))
-    application.add_handler(CommandHandler('restart', restart_command))
+    # Commands with user restriction
+    allowed_users_filter = filters.User(username=users)
+    application.add_handler(
+        CommandHandler("start", start_command, filters=allowed_users_filter)
+    )
+    application.add_handler(
+        CommandHandler("help", help_command, filters=allowed_users_filter)
+    )
+    application.add_handler(
+        CommandHandler("custom", custom_command, filters=allowed_users_filter)
+    )
+    application.add_handler(
+        CommandHandler("restart", restart_command, filters=allowed_users_filter)
+    )
 
-    # Messages
-    application.add_handler(MessageHandler(filters.ALL, handle_message))
+    # Message handler with user restriction
+    application.add_handler(
+        MessageHandler(filters.ALL & allowed_users_filter, handle_message)
+    )
 
-    # Log all errors
-    application.add_error_handler(error)
+    # Error handler
+    application.add_error_handler(error_handler)
+
     application.run_polling()
-
-    
