@@ -1,9 +1,11 @@
 from langchain.embeddings.base import Embeddings
 from langchain.llms.base import BaseLLM
 from langchain.tools.base import BaseTool
+import os 
 
+USERS = os.getenv("USERS", "")
 
-users = ["your username here"]
+users = [user.strip() for user in USERS.split(",")]
 
 
 def get_llm() -> BaseLLM:
