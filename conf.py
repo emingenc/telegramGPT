@@ -9,6 +9,7 @@ from langchain_ollama import OllamaEmbeddings
 import os 
 
 USERS = os.getenv("USERS", "")
+OLLAMA_BASE_URLS = os.getenv("OLLAMA_BASE_URLS", "localhost:11434")
 
 users = [user.strip() for user in USERS.split(",")]
 
@@ -17,10 +18,11 @@ def get_llm(llmname) -> BaseLLM:
     """Function to get the LLM. Replace with your desired LLM."""
     if llmname == "gpt-4o-mini":
         return ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
-    if llmname == "llama3.2":
+    if llmname == "llama3.1":
         return ChatOllama(
-            model="llama3.2",
+            model="llama3.1",
             temperature=0,
+            base_url=OLLAMA_BASE_URLS,
             # other params...
         )
 
@@ -30,7 +32,9 @@ def get_embeddings(embeddingmodel) -> Embeddings:
         return OpenAIEmbeddings()
     if embeddingmodel == "ollama":
         embed = OllamaEmbeddings(
-            model="llama3"
+            model="llama3",
+            base_url=OLLAMA_BASE_URLS,
+            
         )
         return embed
 
@@ -40,7 +44,7 @@ def get_web_search_tool() -> BaseTool:
     return TavilySearchResults(k=3)
 
 # Initialize components
-# llm = get_llm('llama3.2')
+# llm = get_llm('llama3.1')
 llm = get_llm('gpt-4o-mini')
 # embeddings = get_embeddings('ollama')
 embeddings = get_embeddings('openai')

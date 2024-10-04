@@ -164,7 +164,7 @@ workflow.add_conditional_edges(
     },
 )
 workflow.add_edge("transform_query", "web_search_node")
-workflow.add_edge("web_search_node", "grade_documents")
+workflow.add_edge("web_search_node", "generate")
 workflow.add_edge("generate", END)
 
 # Compile
