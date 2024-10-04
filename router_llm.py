@@ -54,7 +54,6 @@ def assess_query(state: GraphState) -> GraphState:
         assessment = assessment_chain.invoke(
             {"options": options_str, "question": question}
         )
-        print(assessment)
         state.next_step = assessment.get("next_step", END)
         confidence = assessment.get("confidence", 0.0)
         logger.info(
