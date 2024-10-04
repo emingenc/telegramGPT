@@ -1,7 +1,40 @@
 version: '3.8'
 
 services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - 7869:11434
+    volumes:
+      - .:/code
+      - ~/.ollama/models:/root/.ollama/models
+      # macOS: ~/.ollama/models.
+      # Linux: /usr/share/ollama/.ollama/models.
+      # Windows: C:\Users\%username%\.ollama\models.
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - ollama-docker
+
   telegram-gpt-app:
     build: .
     env_file:
       - .env
+    environment:
+      - OLLAMA_BASE_URLS=http://host.docker.internal:7869
+    depends_on:
+      - ollama
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      - ollama-docker
+
+networks:
+  ollama-docker:
+    external: false
+  
