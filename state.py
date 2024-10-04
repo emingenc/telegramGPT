@@ -7,6 +7,5 @@ from pydantic import BaseModel
 class GraphState(BaseModel):
     question: str
     answer: str = ""
-    chat_history: List[str] = []
     next_step: str = "start"
 

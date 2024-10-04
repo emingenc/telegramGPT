@@ -7,7 +7,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain.schema import Document
 from langgraph.graph import StateGraph, START, END
-from langchain.memory import ConversationBufferMemory
 
 
 import sys
@@ -52,9 +51,6 @@ class GraphState(TypedDict):
     web_search: str
     documents: List[Document]
     search_attempts: int  # Add this to track search attempts
-
-# Initialize memory
-memory = ConversationBufferMemory(return_messages=True)
 
 
 

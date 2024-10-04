@@ -6,14 +6,18 @@ from langgraph.graph import StateGraph, END
 from conf import llm
 from state import GraphState
 from nodes import nodes, options_str
+from enum import Enum
 import logging
+
 
 logger = logging.getLogger(__name__)
 
+next_steps = {key: key for key in nodes.keys()}
+next_step_enums = Enum("NextStep", next_steps)
 
 # Define the QueryAssessment model
 class QueryAssessment(BaseModel):
-    next_step: str = Field(description="The key of the most appropriate next step")
+    next_step: next_step_enums = Field(description="The next step to take")
     confidence: float = Field(
         description="Confidence score for the chosen next step (0.0 to 1.0)",
         ge=0.0,
@@ -23,10 +27,17 @@ class QueryAssessment(BaseModel):
 # Assessment function
 def assess_query(state: GraphState) -> GraphState:
     question = state.question
-    prompt_template = """Analyze the user's question and chat history to determine the most appropriate next step.
-    Consider the following options: {options} 
-    
-    question: {question}
+    prompt_template = """
+    Determine the most appropriate next step based on the user's question and chat history.
+
+    Options:
+    {options}
+
+    Question:
+    {question}
+    choose best option for question.
+    respond Only JSON format output.
+    {{'next_step': selected_option, 'confidence': confidence}}
     {format_instructions}"""
 
     parser = JsonOutputParser(pydantic_object=QueryAssessment)
