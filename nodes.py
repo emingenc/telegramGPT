@@ -1,12 +1,11 @@
-from services import retrieve, conversational_rag
+from services import conversational, retrieve
 from agents.crag import run_crag_pipeline
 
 
 nodes = {
-  
-    "conversational_rag": {
-        "description": "Answer the question directly based on existing knowledge. Use RAG pipeline",
-        "node": conversational_rag,
+    "conversational": {
+        "description": "Answer the question directly based on existing knowledge",
+        "node": conversational,
     },
     "retriever": {
         "description": "Use this if user ask about whats in DB Retrieve relevant documents from the vectorstore",

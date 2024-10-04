@@ -2,7 +2,7 @@ from state import GraphState
 from conf import llm
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from vectordb import retriever, add_to_vectorstore
+from vectordb import retriever
 
 
 # Node functions
@@ -17,28 +17,8 @@ def conversational(state: GraphState) -> GraphState:
     chain = prompt | llm | StrOutputParser()
     response = chain.invoke({"question": state.question})
     state.answer = response
-    add_to_vectorstore(state.question, state.answer, retriever)
     return state
 
-def conversational_rag(state: GraphState) -> GraphState:
-    docs = retriever.invoke(state.question)
-    # docs filtered metadata source:chatbot
-    docs = [doc for doc in docs if doc.metadata.get("source") == "chatbot"]
-    chat_history = "\n\n".join(doc.page_content for doc in docs)
-    
-    prompt_template = """
-    You are expert in social sciences. And you are master at chatting with people.
-    history: {chat_history}
-    human: {question}
-    AI:
-    """
-    prompt = PromptTemplate(template=prompt_template, input_variables=["question", "chat_history"])
-
-    chain = prompt | llm | StrOutputParser()
-    response = chain.invoke({"question": state.question, "chat_history": chat_history})
-    state.answer = response
-    add_to_vectorstore(state.question, state.answer, retriever)
-    return state
 
 
 def retrieve(state: GraphState) -> GraphState:
