@@ -26,7 +26,16 @@ def retrieve(state: GraphState) -> GraphState:
     if not docs:
         state.answer = "Sorry, I couldn't find any relevant documents."
     docsstr = "\n\n".join(doc.page_content for doc in docs)
-    state.answer = docsstr
+    rag_prompt_template = """
+    Search results for: {question}
+    {docs}
+    answer:
+    """
+    
+    rag_prompt = PromptTemplate(template=rag_prompt_template, input_variables=["question", "docs"])
+    chain = rag_prompt | llm | StrOutputParser()
+    response = chain.invoke({"question": state.question, "docs": docsstr})
+    state.answer = response
     return state
 
 
