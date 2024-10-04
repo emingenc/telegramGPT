@@ -16,10 +16,10 @@ You can add any additional llm to the nodes.py file.
 
 ### Prerequisites
 
-- Python 3.10 or higher
 - A Telegram account
 - A Telegram bot API token (you can get one from the BotFather bot on Telegram)
 - An OpenAI API key (you can get one by signing up on the OpenAI website)
+- make sure you added your username in conf.py
 - Docker and docker-compose
 
 ### Steps
