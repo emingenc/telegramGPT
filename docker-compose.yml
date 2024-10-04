@@ -33,6 +33,8 @@ services:
       - host.docker.internal:host-gateway
     networks:
       - ollama-docker
+    volumes:
+      - .:/app
 
 networks:
   ollama-docker:
