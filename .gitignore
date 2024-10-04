@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+vectorstore_db/*
+
 # Distribution / packaging
 .Python
 build/
