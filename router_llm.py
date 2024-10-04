@@ -38,7 +38,8 @@ def assess_query(state: GraphState) -> GraphState:
     choose best option for question.
     respond Only JSON format output.
     {{'next_step': selected_option, 'confidence': confidence}}
-    {format_instructions}"""
+    {format_instructions}
+    Only JSON:"""
 
     parser = JsonOutputParser(pydantic_object=QueryAssessment)
     assessment_prompt = PromptTemplate(
