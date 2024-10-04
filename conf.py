@@ -3,7 +3,7 @@ from langchain.llms.base import BaseLLM
 from langchain.tools.base import BaseTool
 
 
-users = ["emingench"]
+users = ["your username here"]
 
 
 def get_llm() -> BaseLLM:

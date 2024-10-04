@@ -5,35 +5,28 @@ from typing_extensions import TypedDict
 
 # Import LangChain components
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts.chat import ChatPromptTemplate
 from langchain.schema import Document
 from langgraph.graph import StateGraph, START, END
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
 
-from conf import llm, web_search_tool
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 from vectordb import retriever, add_to_vectorstore
+from conf import llm, web_search_tool
 
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Data models
-class GradeDocuments(BaseModel):
-    """Binary score for relevance check on retrieved documents."""
-    binary_score: str = Field(
-        description="Documents are relevant to the question, 'yes' or 'no'"
-    )
-parser = JsonOutputParser(pydantic_object=GradeDocuments)
-
-# Grading LLM with function call
-structured_llm_grader = llm | parser
 
 # Grading prompt
 grading_system_prompt = """.You are a grader assessing relevance of a retrieved document to a user question.
@@ -45,17 +38,9 @@ grade_prompt_template = ChatPromptTemplate.from_messages([
     ("user", "Retrieved document:\n\n{document}\n\nUser question: {question}")
 ])
 
-retrieval_grader_chain = grade_prompt_template | structured_llm_grader | StrOutputParser()
+retrieval_grader_chain = grade_prompt_template | llm |  StrOutputParser()
 
-# Main prompt for RAG generation
-rag_prompt_template = PromptTemplate.from_template(
-    "You are an AI assistant answering questions based on the following context and chat history.\n"
-    "Context: {context}\n"
-    "Human: {question}\n"
-    "AI: "
-)
 
-rag_chain = rag_prompt_template | llm | StrOutputParser()
 
 # Post-processing
 def format_docs(docs: List[Document]) -> str:
@@ -68,7 +53,6 @@ class GraphState(TypedDict):
     generation: str
     web_search: str
     documents: List[Document]
-    chat_history: List[Dict[str, str]]
 
 # Initialize memory
 memory = ConversationBufferMemory(return_messages=True)
@@ -121,16 +105,22 @@ def generate(state: GraphState) -> Dict[str, Any]:
     logger.info("Generating answer with RAG...")
     question = state["question"]
     documents = state["documents"]
-    chat_history = state.get("chat_history", [])
     
     context = format_docs(documents)
-    
-    generation = rag_chain.invoke(context=context, chat_history=str(chat_history), question=question)
-    
-    # Update chat history
-    chat_history.append({"human": question, "ai": generation})
-    
-    return {"generation": generation, "chat_history": chat_history}
+    # Main prompt for RAG generation
+    rag_prompt_template = PromptTemplate(
+        template=(
+        "You are an AI assistant answering questions based on the following context and chat history.\n"
+        "Context: {context}\n"
+        "Human: {question}\n"
+        "AI: "
+    ),
+        input_variables=["context", "question"])
+
+    rag_chain = rag_prompt_template | llm | StrOutputParser()
+    query = {"context": context, "question": question}
+    generation = rag_chain.invoke(query)
+    return {"generation": generation}
 
 
 def decide_to_generate(state: GraphState) -> str:
@@ -172,16 +162,16 @@ crag = workflow.compile()
 
 
 # Main function to run the app
-def run_pipeline(question: str, chat_history: List[Dict[str, str]] = None) -> str:
+def run_pipeline(question: str) -> str:
     """Run the RAG pipeline with the given question and chat history."""
-    state = {"question": question, "chat_history": chat_history or []}
+    state = {"question": question}
     result = crag.invoke(state)
     answer = result.get("generation", "")
     
     # Add the question and answer to vectorstore for future retrieval
     add_to_vectorstore(question, answer, retriever)
     
-    return answer, result.get("chat_history", [])
+    return answer
 
 # Example usage
 if __name__ == "__main__":
@@ -190,5 +180,5 @@ if __name__ == "__main__":
         question = input("Human: ")
         if question.lower() == "exit":
             break
-        answer, chat_history = run_pipeline(question, chat_history)
+        answer = run_pipeline(question)
         print("AI:", answer)
