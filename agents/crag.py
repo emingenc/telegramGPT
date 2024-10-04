@@ -142,11 +142,9 @@ def decide_next_step(state: GraphState) -> str:
     
     if web_search == "Yes" and search_attempts < 2:  # Limit to 2 search attempts
         return "transform_query"
-    elif len(state.get("documents", [])) > 0:
+    else :
         return "generate"
-    else:
-        return "end"  # Add an "end" condition if no relevant documents are found after attempts
-
+  
 # Workflow
 workflow = StateGraph(GraphState)
 
@@ -178,15 +176,15 @@ crag = workflow.compile()
 
 
 # Main function to run the app
-def run_pipeline(query: dict) -> str:
+def run_crag_pipeline(query: dict) -> str:
     """Run the RAG pipeline with the given question and chat history."""
     result = crag.invoke(query)
-    return result.get("answer", "Sorry, I couldn't find an answer to your question.")
+    return result
 
 # Example usage
 if __name__ == "__main__":
     chat_history = []
     question = "How is the weather in New York?"
     query = {"question": question}
-    answer = run_pipeline(query)
+    answer = run_crag_pipeline(query)
     print("AI:", answer)
