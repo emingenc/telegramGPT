@@ -11,10 +11,11 @@ when you change models at conf.py be sure start new evctordb since vector dimens
 you can give any llm in nodes.py router_llm.py automatically use optimal llm for you.
 
 You can add any additional llm to the nodes.py file. 
-
-![diagram](https://github.com/user-attachments/assets/74e02987-dcc4-4d7a-a929-01142d6a60b8)
-
 you can add as many route to nodes.py these nodes will be assessed in router_llm.py
+
+![telegramgpt_llm_router](https://github.com/user-attachments/assets/ff5af371-d23b-408f-981f-678f5ad5ac50)
+
+
 
 
 ## Quick start
