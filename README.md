@@ -20,6 +20,10 @@ you can add as many route to nodes.py these nodes will be assessed in router_llm
 
 you can add as many route to nodes.py these nodes will be assessed in router_llm.py
 
+![telegramgpt_llm_router](https://github.com/user-attachments/assets/ff5af371-d23b-408f-981f-678f5ad5ac50)
+
+
+
 
 ## Quick start
 
