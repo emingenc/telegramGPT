@@ -12,6 +12,9 @@ you can give any llm in nodes.py router_llm.py automatically use optimal llm for
 
 You can add any additional llm to the nodes.py file. 
 
+![diagram](https://github.com/user-attachments/assets/74e02987-dcc4-4d7a-a929-01142d6a60b8)
+
+you can add as many route to nodes.py these nodes will be assessed in router_llm.py
 
 
 ## Quick start
