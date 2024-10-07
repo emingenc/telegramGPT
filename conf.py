@@ -13,7 +13,6 @@ OLLAMA_BASE_URLS = os.getenv("OLLAMA_BASE_URLS", "localhost:11434")
 
 users = [user.strip() for user in USERS.split(",")]
 
-USERS = os.getenv("USERS", "")
 
 def get_llm(llmname) -> BaseLLM:
     """Function to get the LLM. Replace with your desired LLM."""
