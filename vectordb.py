@@ -38,11 +38,7 @@ def initialize_vectorstore(docs: List[Document]) -> Chroma:
     logger.info("Vector store initialized successfully.")
 
     retriever = vector_store.as_retriever(
-<<<<<<< HEAD
         search_type="mmr", search_kwargs={"k": 3, "fetch_k": 5}
-=======
-        search_type="mmr", search_kwargs={"k": 3, "fetch_k": 10}
->>>>>>> 3df12e8 (add chat history)
     )
     retriever = vector_store.as_retriever(
     search_type="mmr", search_kwargs={"k": 1, "fetch_k": 5}
