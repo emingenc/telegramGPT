@@ -11,3 +11,4 @@ chromadb==0.5.11
 langchain-chroma==0.1.4
 langchain-ollama==0.2.0
 ollama==0.3.3
+llm-adaptive-router==0.1.10

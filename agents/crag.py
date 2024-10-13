@@ -172,10 +172,12 @@ crag = workflow.compile()
 
 
 # Main function to run the app
-def run_crag_pipeline(query: dict) -> str:
+def run_crag_pipeline(query: str) -> str:
     """Run the RAG pipeline with the given question and chat history."""
+    query = {"question": query}
     result = crag.invoke(query)
-    return result
+    answer = result.get("answer", "Sorry, I couldn't find an answer to your question.")
+    return answer
 
 # Example usage
 if __name__ == "__main__":

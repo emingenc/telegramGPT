@@ -1,4 +1,4 @@
-from router_llm import app
+from router import router
 from vectordb import add_to_vectorstore
 
 REMEMBER = True
@@ -21,6 +21,8 @@ def filter_chat(username, user_id, docs):
 
 def handle_response(content, user, message_id, content_type) -> str:
     print(content, user, message_id, content_type)
+    route = router.route(content)
+    
     if REMEMBER:
         # imported here to update the retriever in memory every time
         from vectordb import retriever
@@ -31,16 +33,17 @@ def handle_response(content, user, message_id, content_type) -> str:
         user_dict = {"username": username, "id": user_id}
         chat_history = filter_chat(username, user_id, docs)
         if chat_history:
-            query = {"question": f"chat_history: {chat_history} Question: {content} Ai:"}
+            query = f"chat_history: {chat_history} Question: {content} Ai:"
         else:
-            query = {"question": content}
-        response = app.invoke(query)
-        add_to_vectorstore(content, response.get("answer"), user_dict, retriever)
+            query =  content
+        print(query)
+        print("model::::", route.name)
+        response =  route.invoker(query)
+        add_to_vectorstore(content, response, user_dict, retriever)
     else:
-        query = {"question": content}
-        response = app.invoke(query)
-    answer = response.get("answer")
-    answer = f"{response.get('next_step')}: {answer}"
+        response = route.invoker(content)
+    answer = response
+    answer = f"{route.name}: {answer}"
     if not answer:
         return "Sorry, I couldn't find an answer to your question."
     return answer
