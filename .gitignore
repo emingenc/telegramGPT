@@ -8,6 +8,7 @@ __pycache__/
 
 vectorstore_db/*
 router_vectorstore_db/*
+outputs/*
 
 # Distribution / packaging
 .Python

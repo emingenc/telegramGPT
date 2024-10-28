@@ -84,9 +84,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         file = await context.bot.get_file(content)
         file_path = await file.download_to_drive()
         # Pass the file path to handle_response
-        response = handle_response(file_path, user, message_id, content_type)
+        response = await handle_response(file_path, user, message_id, content_type)
 
-    await message.reply_text(response)
+    if type(response) == str and len(response) > 1000:
+        file_name = f"result.md"
+        with open(file_name, "w") as file:
+            file.write(response)
+        await message.reply_document(file_name)
+
+    if type(response) == str:
+        await message.reply_markdown(response)
+    else:
+        await message.reply_markdown(response)
 
 
 def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE):

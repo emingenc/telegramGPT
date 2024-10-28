@@ -1,6 +1,6 @@
 from llm_adaptive_router import RouteMetadata
 
-from services import conversational, retrieve, run_crag_pipeline
+from services import conversational, retrieve, run_crag_pipeline, run_research
 
 
 routes = {
@@ -27,5 +27,17 @@ routes = {
             performance_score=0.9,
             example_sentences=["What's the weather forecast for tomorrow in New York City?", 
                                "Who won the Nobel Prize in Literature this year?"],
+        ),
+        "research": RouteMetadata(
+            invoker=run_research,
+            capabilities=["research","web search and report"],
+            cost=0.002,
+            performance_score=0.9,
+            example_sentences=["What is the best way to cook a steak?",
+                               "What is the best way do algotrade?",
+                               "Research the history of the internet.",
+                               "Research",
+                               "Give me a report"
+                               ],
         ),
     }

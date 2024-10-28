@@ -11,7 +11,7 @@ async def handle_response(content, user, message_id, content_type) -> str:
         "content_type": content_type
     }
     route = router.route(content)
-    response =  await route.invoker(content, config)
+    response = await route.invoker(content, config)
     message = f"{route.name}:{response}"
     return message
 
