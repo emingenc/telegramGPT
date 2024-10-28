@@ -6,12 +6,11 @@ Are you tired of using the same AI-powered chatbots available on the market? Do 
 
 when you change models at conf.py be sure start new evctordb since vector dimension is different for each model.
 
-## Route llm usage
+## Router  usage
 
-you can give any llm in nodes.py router_llm.py automatically use optimal llm for you.
+you can give any llm in routes.py file.
 
-You can add any additional llm to the nodes.py file. 
-you can add as many route to nodes.py these nodes will be assessed in router_llm.py
+You can add any additional llm to the routes.py file. 
 
 ![telegramgpt_llm_router](https://github.com/user-attachments/assets/ff5af371-d23b-408f-981f-678f5ad5ac50)
 
@@ -33,16 +32,20 @@ you can add as many route to nodes.py these nodes will be assessed in router_llm
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/emingenc/telegramGPT.git
+git clone --recursive https://github.com/emingenc/telegramGPT.git
 cd telegramGPT
 ```
 
 2. Set up environment variables create .env file
     
     ```bash
-    TELEGRAM_TOKEN=your_telegram_token
-    OPENAI_API_KEY=your_openai_api_key
-    BOTNAME=your_bot_name
+    TELEGRAM_TOKEN="your telegram token"
+    OPENAI_API_KEY="your openai api key"
+    BOTNAME="your bots name"
+    TAVILY_API_KEY="tav api key"
+    USERS=allowed users
+    ANTHROPIC_API_KEY="anthropic api key"
+
     ```
 
 3. Run the bot using docker-compose:
@@ -66,7 +69,7 @@ Before diving into the code, you'll need to create a new bot on Telegram. Follow
 Clone the code repository from GitHub using the following command:
 
 ```bash
-git clone https://github.com/emingenc/telegramGPT.git
+git clone --recursive https://github.com/emingenc/telegramGPT.git
 cd telegramGPT
 ```
 
