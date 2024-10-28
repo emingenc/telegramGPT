@@ -78,7 +78,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if content_type == "text":
-        response = handle_response(content, user, message_id, content_type)
+        response = await handle_response(content, user, message_id, content_type)
     else:
         # For media files, download the file
         file = await context.bot.get_file(content)

@@ -1,6 +1,6 @@
 python-telegram-bot==21.6
-langchain==0.3.1
-langchain-community==0.3.1
+langchain==0.3.4
+langchain-community>=0.3.3
 langchain-openai==0.2.1
 langgraph==0.2.34
 python-dotenv==1.0.1
@@ -11,4 +11,5 @@ chromadb==0.5.11
 langchain-chroma==0.1.4
 langchain-ollama==0.2.0
 ollama==0.3.3
-llm-adaptive-router==0.1.10
+llm-adaptive-router==0.1.13
+langchain-anthropic==0.2.3

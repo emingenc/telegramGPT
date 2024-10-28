@@ -1,0 +1,3 @@
+[submodule "agents/gpt_researcher"]
+	path = agents/gpt_researcher
+	url = https://github.com/assafelovic/gpt-researcher.git

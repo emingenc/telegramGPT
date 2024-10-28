@@ -2,23 +2,33 @@ from conf import llm
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from vectordb import retriever
-
-
-def conversational(content) -> str:
-    prompt_template = """
-    You are expert in social sciences. And you are master at chatting with people.
-    human: {question}
-    AI:
-    """
-    prompt = PromptTemplate(template=prompt_template, input_variables=["question"])
-
-    chain = prompt | llm | StrOutputParser()
-    response = chain.invoke({"question": content})
-    return response
+from agents.memory_agent.graph import builder
+from agents.crag import crag
+from langgraph.store.memory import InMemoryStore
 
 
 
-def retrieve(content) -> str:
+mem_store = InMemoryStore()
+async def conversational(content, config={}) -> str:
+
+    graph = builder.compile(store=mem_store)
+    config = {
+        "configurable": {},
+        "user_id": str(config.get("user_id")),
+    }
+    
+    response =  await graph.ainvoke(
+            {"messages": [("user", content)]},
+            {**config, "thread_id": "thread"},
+        )
+    messages = response.get("messages", [])
+    last_message = messages[-1] if messages else None
+    content = last_message.content if last_message else None
+    return content
+
+
+
+async def retrieve(content, config={}) -> str:
     docs = retriever.invoke(content)
     if not docs:
         return "Sorry, I couldn't find any relevant documents."
@@ -31,6 +41,13 @@ def retrieve(content) -> str:
     
     rag_prompt = PromptTemplate(template=rag_prompt_template, input_variables=["question", "docs"])
     chain = rag_prompt | llm | StrOutputParser()
-    response = chain.invoke({"question": content, "docs": docsstr})
+    response =  chain.invoke({"question": content, "docs": docsstr})
     return response
 
+
+async def run_crag_pipeline(query: str , config={}) -> str:
+    """Run the RAG pipeline with the given question and chat history."""
+    query = {"question": query}
+    result =  crag.invoke(query)
+    answer = result.get("answer", "Sorry, I couldn't find an answer to your question.")
+    return answer

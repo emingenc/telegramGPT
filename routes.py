@@ -1,19 +1,18 @@
 from llm_adaptive_router import RouteMetadata
 
-from services import conversational, retrieve
-from agents.crag import run_crag_pipeline
+from services import conversational, retrieve, run_crag_pipeline
 
 
 routes = {
-        "conversational": RouteMetadata(
+        "conv": RouteMetadata(
             invoker=conversational,
-            capabilities=["general knowledge",],
+            capabilities=["general knowledge","memory storage"],
             cost=0.002,
             performance_score=0.9,
             example_sentences=["Hi", "How is it going?", "How are you?"],
             # additional_info={"key": "value"},
         ),
-        "retriever": RouteMetadata(
+        "retrv": RouteMetadata(
             invoker=retrieve,
             capabilities=["retrieval",],
             cost=0.002,

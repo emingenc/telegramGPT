@@ -169,20 +169,3 @@ workflow.add_edge("generate", END)
 
 # Compile
 crag = workflow.compile()
-
-
-# Main function to run the app
-def run_crag_pipeline(query: str) -> str:
-    """Run the RAG pipeline with the given question and chat history."""
-    query = {"question": query}
-    result = crag.invoke(query)
-    answer = result.get("answer", "Sorry, I couldn't find an answer to your question.")
-    return answer
-
-# Example usage
-if __name__ == "__main__":
-    chat_history = []
-    question = "How is the weather in New York?"
-    query = {"question": question}
-    answer = run_crag_pipeline(query)
-    print("AI:", answer)
