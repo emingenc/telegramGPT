@@ -77,5 +77,8 @@ async def run_research(query: str, config={}) -> str:
     tone = Tone.Objective
 
     chief_editor = ChiefEditorAgent(task, tone=tone)
-    research_report =await chief_editor.run_research_task(task_id=uuid.uuid4())
+    task_id = uuid.uuid4()
+    research =await chief_editor.run_research_task(task_id=task_id)
+    research_report = research.get("report",f"P{task_id}:{query} research report is ready.")
+    
     return research_report
